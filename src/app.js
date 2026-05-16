@@ -13,18 +13,25 @@ const app = express();
 // })
 
 //Handles Auth middleware for all
-app.use("/admin", adminAuth);
+// app.use("/admin", adminAuth);
 
 app.post("/user/login", (req, res) => {
   res.send("Logged In");
 });
 
 app.get("/user/data", userAuth, (req, res) => {
-  res.send("User data");
+  throw new Error("Failed");
+  //   res.send("User data");
 });
 
 app.get("/admin/getAllData", (req, res) => {
   res.send("Got all data");
+});
+
+app.use((err, req, res, next) => {
+  if (err) {
+    res.status(500).send("Something went wrong");
+  }
 });
 
 // app.get("/test/:testId/:testDesc", (req, res) => {
