@@ -10,11 +10,22 @@ const app = express();
 //     res.send('Hello, World from main!');
 // })
 
-app.use("/test",(req, res) => {
-    res.send('Hello, World from test!');
-})
+// app.use("/test",(req, res) => {
+//     res.send('Hello, World from test!');
+// })
 
 app.get("/test", (req, res) => {
+  console.log(req.query); //can get query params from URL
+  res.send("Response sent");
+});
+
+app.get("/test/:testId", (req, res) => {
+  console.log(req.params); //can get params from URL
+  res.send("Response sent");
+});
+
+app.get("/test/:testId/:testDesc", (req, res) => {
+  console.log(req.params); //can get params from URL
   res.send("Response sent");
 });
 
