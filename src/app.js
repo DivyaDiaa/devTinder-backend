@@ -1,5 +1,7 @@
 const express = require("express");
 
+const { adminAuth, userAuth } = require("./middlewares/auth");
+
 const app = express();
 
 // app.use("/test/1",(req, res) => {
@@ -10,32 +12,25 @@ const app = express();
 //     res.send('Hello, World from main!');
 // })
 
-// app.use("/test",(req, res) => {
-//     res.send('Hello, World from test!');
-// })
+//Handles Auth middleware for all
+app.use("/admin", adminAuth);
 
-app.get("/test", (req, res) => {
-  console.log(req.query); //can get query params from URL
-  res.send("Response sent");
+app.post("/user/login", (req, res) => {
+  res.send("Logged In");
 });
 
-app.get("/test/:testId", (req, res) => {
-  console.log(req.params); //can get params from URL
-  res.send("Response sent");
+app.get("/user/data", userAuth, (req, res) => {
+  res.send("User data");
 });
 
-app.get("/test/:testId/:testDesc", (req, res) => {
-  console.log(req.params); //can get params from URL
-  res.send("Response sent");
+app.get("/admin/getAllData", (req, res) => {
+  res.send("Got all data");
 });
 
-app.post("/test", (req, res) => {
-  res.send("Data saveed to DB");
-});
-
-app.delete("/test", (req, res) => {
-  res.send("Deleted ");
-});
+// app.get("/test/:testId/:testDesc", (req, res) => {
+//   console.log(req.params); //can get params from URL
+//   res.send("Response sent");
+// });
 
 app.listen(4000, () => {
   console.log("Server is running on port 4000");
