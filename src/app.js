@@ -1,5 +1,6 @@
 const express = require("express");
 const connectDB = require("./config/database");
+
 const userModel = require("./models/user");
 
 const app = express();
@@ -58,19 +59,24 @@ app.delete("/user", async (req, res) => {
   }
 });
 
-app.patch("/user", async (req, res) => {
-  console.log(req.body);
+app.patch("/user/:userId", async (req, res) => {
   try {
+    const allowedKeys = ["firstName", "lastName", "location", "password"];
+
+    const isAllowedKeys = Object.keys(req.body).every((k) =>
+      allowedKeys.includes(k),
+    );
+    if (!isAllowedKeys) {
+      throw new Error("Update not allowed");
+    }
     const updateUser = await userModel.findByIdAndUpdate(
-      req.body._id,
+      req.params.userId,
       req.body,
       { returnDocument: "after", runValidators: true }, //options argumnet
     );
-    console.log(updateUser); //will give before update data if u need current updateed data
-    //please add 3rd argument
     res.send("User updated");
   } catch (err) {
-    res.status(400).send("Something went wrong "+ err.message);
+    res.status(400).send("Something went wrong " + err.message);
   }
 });
 
