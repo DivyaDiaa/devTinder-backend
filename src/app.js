@@ -4,20 +4,47 @@ const userModel = require("./models/user");
 
 const app = express();
 
+app.use(express.json()); //will change json to js object
+
 app.post("/signup", async (req, res) => {
-  const userObj = {
-    firstName: "Divya",
-    lastName: "Palanivel",
-    emailId: "divyadreams2002@gmail.com",
-    password: "SreeSiva@1904",
-  };
+  console.log(req.body);
+  //here it will come undefined as you need middleware becuase data will be coming in Json format
+  // const userObj = {
+  //   firstName: "Siva",
+  //   lastName: "Chandran",
+  //   emailId: "siva2000@gmail.com",
+  //   password: "Siva@1904",
+  // };
+  const user = new userModel(req.body);
 
   try {
-    const user = new userModel(userObj);
+    // const user = new userModel(userObj);
     await user.save();
     res.send("Database connected ");
   } catch (err) {
     res.status(400).send("Error saving the user: " + err.message);
+  }
+});
+
+app.get("/user", async (req, res) => {
+  const userEmail = req.body.emailId;
+  try {
+    const userData = await userModel.find({ emailId: userEmail });
+    if (userData !== 1) {
+      res.status(400).send("user not found");
+    }
+    res.send(userData);
+  } catch (err) {
+    res.status(400).send("Soemthing went wrong");
+  }
+});
+
+app.get("/feed", async (req, res) => {
+  try {
+    const allData = await userModel.find({});
+    res.send(allData);
+  } catch (err) {
+    res.status(400).send("Soemthing went wrong");
   }
 });
 
