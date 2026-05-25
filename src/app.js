@@ -1,25 +1,32 @@
 const express = require("express");
 const connectDB = require("./config/database");
+const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 
 const userModel = require("./models/user");
+const { validateSignUpData } = require("./utils/validation");
+const { userAuth } = require("./middlewares/auth");
 
 const app = express();
 
 app.use(express.json()); //will change json to js object
+app.use(cookieParser());
 
 app.post("/signup", async (req, res) => {
-  console.log(req.body);
-  //here it will come undefined as you need middleware becuase data will be coming in Json format
-  // const userObj = {
-  //   firstName: "Siva",
-  //   lastName: "Chandran",
-  //   emailId: "siva2000@gmail.com",
-  //   password: "Siva@1904",
-  // };
-  const user = new userModel(req.body);
-
+  //const user = new userModel(req.body);
   try {
-    // const user = new userModel(userObj);
+    const { firstName, lastName, emailId, password, age } = req.body;
+    validateSignUpData(req);
+    const passwordEncryption = await bcrypt.hash(req.body.password, 5);
+
+    const user = new userModel({
+      firstName,
+      lastName,
+      emailId,
+      password: passwordEncryption,
+      age,
+    });
     await user.save();
     res.send("Database connected ");
   } catch (err) {
@@ -27,56 +34,60 @@ app.post("/signup", async (req, res) => {
   }
 });
 
-app.get("/user", async (req, res) => {
-  const userEmail = req.body.emailId;
+app.post("/login", async (req, res) => {
   try {
-    const userData = await userModel.find({ emailId: userEmail });
-    if (userData !== 1) {
-      res.status(400).send("user not found");
+    const alreadyUserPresent = await userModel.findOne({
+      emailId: req.body.emailId,
+    });
+    if (!alreadyUserPresent) {
+      throw new Error("Invalid credentials");
     }
-    res.send(userData);
-  } catch (err) {
-    res.status(400).send("Soemthing went wrong");
-  }
-});
-
-app.get("/feed", async (req, res) => {
-  try {
-    const allData = await userModel.find({});
-    console.log(allData);
-    res.send(allData);
-  } catch (err) {
-    res.status(400).send("Soemthing went wrong");
-  }
-});
-
-app.delete("/user", async (req, res) => {
-  try {
-    const deleteUser = await userModel.findByIdAndDelete({ _id: req.body._id });
-    res.send("User deleted");
-  } catch (err) {
-    res.status(400).send("Soemthing went wrong");
-  }
-});
-
-app.patch("/user/:userId", async (req, res) => {
-  try {
-    const allowedKeys = ["firstName", "lastName", "location", "password"];
-
-    const isAllowedKeys = Object.keys(req.body).every((k) =>
-      allowedKeys.includes(k),
+    // const isPasswordValid = await bcrypt.compare(
+    //   req.body.password,
+    //   alreadyUserPresent.password,
+    // );
+    const isPasswordValid = await alreadyUserPresent.validatePassword(
+      req.body.password,
     );
-    if (!isAllowedKeys) {
-      throw new Error("Update not allowed");
+
+    if (isPasswordValid) {
+      //create a JWT token
+
+      const token = await alreadyUserPresent.getJWT(); //calling getJWT method which is defined in user model and it will return the token
+      console.log(token);
+
+      res.cookie("token", token, {
+        httpOnly: true,
+        expires: new Date(Date.now() + 3600000),
+      }); //setting cookie with token and expiry time of 1 hour
+      res.send("User logged In");
+    } else {
+      throw new Error("Please check again");
     }
-    const updateUser = await userModel.findByIdAndUpdate(
-      req.params.userId,
-      req.body,
-      { returnDocument: "after", runValidators: true }, //options argumnet
-    );
-    res.send("User updated");
   } catch (err) {
-    res.status(400).send("Something went wrong " + err.message);
+    res.status(400).send(err.message);
+  }
+});
+
+//making API call in secured way by checking if its logged in user or not by using userAuth middleware
+app.post("/sendConnectionRequest", userAuth, async (req, res) => {
+  try {
+    //reading user data
+    const user = req.user; //from userAuth middleware we are storing user data in req object and here we are getting that data
+    console.log("Logged in user data is ", user);
+
+    res.send("Connection request sent");
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+});
+
+app.get("/profile", userAuth, async (req, res) => {
+  try {
+    const user = req.user; //getting user data from req object which is stored in userAuth middleware
+    res.send(user);
+  } catch (err) {
+    res.status(400).send(err.message);
   }
 });
 
