@@ -1,14 +1,14 @@
-authRouter
+### authRouter
 - POST /signup
 - POST /login
 - POST /logout
 
-profileRouter
+### profileRouter
 - GET /profile/view (logged in user data)
 - PATCH /profile/edit (update the profile except password or email)
 - PATCH /profile/password
 
-connectionRouter
+### connectionRouter
 The request which we send
 - POST /request/send/interested/:userId
 - POST /request/send/ignored/:userId
@@ -17,7 +17,7 @@ The request which is been sent to us
 - POST /request/review/accepted/:requestId
 - POST /request/review/rejected/:requestId
 
-userRouter
+### userRouter
 - GET /connections
 - GET /requests/received
 - GET /feed (profiles which comes into home page)
