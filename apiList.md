@@ -12,6 +12,7 @@
 The request which we send
 - POST /request/send/interested/:userId
 - POST /request/send/ignored/:userId
+- POST /request/send/:status/:userId
 
 The request which is been sent to us
 - POST /request/review/accepted/:requestId
@@ -23,3 +24,4 @@ The request which is been sent to us
 - GET /feed (profiles which comes into home page)
 
 Status --> ignored, interested, accepted, rejected
+

@@ -39,11 +39,15 @@ const userSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      validate(value) {
-        if (!["male", "female", "other"].includes(value)) {
-          throw new Error("User is not valid human");
-        }
-      }, //validate fucntion will onky work for new documents adding
+      enum: {
+        values: ["male", "female", "other"],
+        message: `{VALUE} is not supported or invalid gender`,
+      },
+      // validate(value) {
+      //   if (!["male", "female", "other"].includes(value)) {
+      //     throw new Error("User is not valid human");
+      //   }
+      // }, //validate fucntion will onky work for new documents adding
       //for making it to wrk in patch update u need to call runValidators in patch as options argumnet
     },
     location: {
