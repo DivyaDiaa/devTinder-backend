@@ -8,10 +8,10 @@ const userAuth = async (req, res, next) => {
       throw new Error("Token is not present");
     }
     const getIdFromToken = jwt.verify(token, "DEVtinder@2026");
-    console.log(getIdFromToken); //decoded id from token
+    //console.log(getIdFromToken); //decoded id from token
 
     const { _id } = getIdFromToken;
-    console.log("Logged in user id is ", _id);
+    //console.log("Logged in user id is ", _id);
 
     const userData = await userModel.findById(_id);
     if (!userData) {

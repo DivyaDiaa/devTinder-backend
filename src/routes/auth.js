@@ -51,7 +51,7 @@ authRouter.post("/login", async (req, res) => {
       //create a JWT token
 
       const token = await alreadyUserPresent.getJWT(); //calling getJWT method which is defined in user model and it will return the token
-      console.log(token);
+      // console.log(token);
 
       res.cookie("token", token, {
         httpOnly: true,

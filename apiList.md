@@ -17,10 +17,11 @@ The request which we send
 The request which is been sent to us
 - POST /request/review/accepted/:requestId
 - POST /request/review/rejected/:requestId
+- POST /request/review/:status/:userId
 
 ### userRouter
+- GET /user/requests/received
 - GET /connections
-- GET /requests/received
 - GET /feed (profiles which comes into home page)
 
 Status --> ignored, interested, accepted, rejected

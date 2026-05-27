@@ -35,7 +35,7 @@ requestRouter.post(
           message: "No existing request found",
         });
       }
-      console.log("Existing request", existingRequest);
+      // console.log("Existing request", existingRequest);
 
       const toUser = await userModel.findById(toUserId);
       if (!toUser) {
@@ -67,4 +67,43 @@ requestRouter.post(
   },
 );
 
+requestRouter.post(
+  "/request/review/:status/:userId",
+  userAuth,
+  async (req, res) => {
+    try {
+      const loggedInUser = req.user;
+      const status = req.params.status;
+      const fromUserId = req.params.userId;
+      const toUserId = loggedInUser._id;
+
+      const allowedStatus = ["accepted", "rejected"];
+      if (!allowedStatus.includes(status)) {
+        return res.status(400).json({
+          message: "Invalid status",
+        });
+      }
+
+      const existingRequest = await ConnectionRequestModel.findOne({
+        fromUserId,
+        toUserId,
+        status: "interested",
+      });
+      if (!existingRequest) {
+        return res.status(400).json({
+          message: "No existing request found",
+        });
+      }
+
+      existingRequest.status = status;
+      const data = await existingRequest.save();
+      res.status(200).json({
+        message: `${req.user.firstName} ${status}`,
+        data,
+      });
+    } catch (err) {
+      res.status(400).send(err.message);
+    }
+  },
+);
 module.exports = requestRouter;
