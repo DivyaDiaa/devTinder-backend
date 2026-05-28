@@ -1,7 +1,15 @@
 const express = require("express");
 const connectDB = require("./config/database");
+const cors = require("cors");
 
 const app = express();
+app.use(express.json());
+app.use(
+  cors({
+    origin: "http://localhost:5173", //for getting cookies 
+    credentials: true,
+  }),
+);
 
 const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
@@ -17,7 +25,7 @@ connectDB()
   .then(() => {
     console.log("Database connection is established");
     app.listen(4000, () => {
-      console.log("Server is successfully listening on port 4200");
+      console.log("Server is successfully listening on port 4000");
     });
   })
   .catch((err) => {

@@ -25,7 +25,7 @@ authRouter.post("/signup", async (req, res) => {
       age,
     });
     await user.save();
-    res.send("Database connected ");
+    res.json(user);
   } catch (err) {
     res.status(400).send("Error saving the user: " + err.message);
   }
@@ -57,7 +57,7 @@ authRouter.post("/login", async (req, res) => {
         httpOnly: true,
         expires: new Date(Date.now() + 3600000),
       }); //setting cookie with token and expiry time of 1 hour
-      res.send("User logged In");
+      res.json(alreadyUserPresent);
     } else {
       throw new Error("Please check again");
     }
