@@ -87,7 +87,6 @@ requestRouter.post(
       const existingRequest = await ConnectionRequestModel.findOne({
         fromUserId,
         toUserId,
-        status: "interested",
       });
       if (!existingRequest) {
         return res.status(400).json({

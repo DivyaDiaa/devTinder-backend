@@ -28,7 +28,7 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
     });
     console.log("Updated user data is ", user);
     await user.save(); //saving the updated user data in db
-    res.send("Profile updated");
+    res.send(user);
   } catch (err) {
     res.status(400).send(err.message);
   }

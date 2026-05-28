@@ -24,8 +24,13 @@ authRouter.post("/signup", async (req, res) => {
       password: passwordEncryption,
       age,
     });
-    await user.save();
-    res.json(user);
+    const saveUser = await user.save();
+    const token = await saveUser.getJWT(); //calling getJWT method which is defined in user model and it will return the token
+    res.cookie("token", token, {
+      httpOnly: true,
+      expires: new Date(Date.now() + 3600000),
+    }); //setting cookie with token and expiry time of 1 hour
+    res.send(saveUser);
   } catch (err) {
     res.status(400).send("Error saving the user: " + err.message);
   }
@@ -69,7 +74,7 @@ authRouter.post("/login", async (req, res) => {
 authRouter.post("/logout", async (req, res) => {
   try {
     // res.clearCookie("token"); //clearing the cookie with name token
-    if(!req.cookies.token){
+    if (!req.cookies.token) {
       throw new Error("User is not logged in");
     }
     res.cookie("token", "", { expires: new Date(0) }); //setting the cookie with empty value and expiry time in past to delete the cookie
